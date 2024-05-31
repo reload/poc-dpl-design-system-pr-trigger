@@ -17,12 +17,6 @@ jobs:
   invoke-external-pr-workflow:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: release-info.json
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.workflow_run.id }}
-
       - name: Invoke external PR workflow
         id: invoke_external_pr_workflow
         uses: fjogeleit/http-request-action@v1
