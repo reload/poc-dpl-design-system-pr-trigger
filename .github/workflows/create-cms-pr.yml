@@ -1,9 +1,6 @@
 name: Create CMS PR
 on:
-  workflow_run:
-    workflows: ["Create release on branch changes"]
-    types:
-      - completed
+  workflow_dispatch:
 
 jobs:
   invoke-external-pr-workflow:
@@ -46,8 +43,17 @@ jobs:
             }
         env:
           REQUEST_URL: ${{ format('https://api.github.com/repos/{0}/dispatches', vars.REMOTE_REPO_GITHUB_HANDLE) }}
-        # Only invoke external PR workflow if the release branch is not develop or master
-        if: ${{ !contains(fromJSON('["develop", "master"]'), env.RELEASE_BRANCH) }}
+        # Only invoke external PR workflow if the release branch is not develop or main
+        if: ${{ !contains(fromJSON('["develop", "main"]'), env.RELEASE_BRANCH) }}
+
+
+      # - name: John
+      #   run: |
+      #     gh api -X POST /
+      #     -H 'Accept: application/vnd.github+json' /
+      #     -H 'Authorization: "${{ format('Bearer {0}', secrets.CMS_PR_CREATION_PAT) }}"' /
+      #     ${{ format('/repos/{0}/dispatches', vars.REMOTE_REPO_GITHUB_HANDLE) }}
+
 
       - name: Adding summary
         run: |
@@ -57,9 +63,9 @@ jobs:
         env:
           BRANCH_URL: "${{ github.event.repository.html_url }}/tree/${{ env.RELEASE_BRANCH }}"
           REMOTE_REPO_GITHUB_HANDLE: "${{ vars.REMOTE_REPO_GITHUB_HANDLE }}"
-      - name: Adding summary about skip if branch is develop or master
-        # TODO: remove hardcoded org/repo
+
+      - name: Adding summary about skip if branch is develop or main
         run: |
           echo "Skipped PR creation because the branch was: $RELEASE_BRANCH " >> $GITHUB_STEP_SUMMARY
           echo "...which is not considered being a release branch. " >> $GITHUB_STEP_SUMMARY
-        if: ${{ contains(fromJSON('["develop", "master"]'), env.RELEASE_BRANCH) }}
+        if: ${{ contains(fromJSON('["develop", "main"]'), env.RELEASE_BRANCH) }}
